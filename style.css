@@ -146,6 +146,30 @@ main {
     background-color: #1a4a9c;
 }
 
+.toggle-arrow {
+    color: var(--accent-color);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0 6px;
+    transition: transform 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.toggle-arrow:hover {
+    color: var(--link-hover-color);
+}
+
+.accordion-button.active .toggle-arrow {
+    transform: rotate(180deg);
+}
+
+.accordion-button.no-children .toggle-arrow {
+    display: none;
+}
+
 .accordion-panel {
     display: none;
     padding: 15px 20px;

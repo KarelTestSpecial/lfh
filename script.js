@@ -154,6 +154,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             button.appendChild(link);
 
+            const toggleArrow = document.createElement('span');
+            toggleArrow.className = 'toggle-arrow';
+            toggleArrow.textContent = '▾';
+            button.appendChild(toggleArrow);
+
             const searchButton = document.createElement('span');
             searchButton.className = 'search-button';
             searchButton.textContent = '>';
@@ -191,6 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
         container.addEventListener('click', async function(event) {
             event.preventDefault();
             const searchButton = event.target.closest('.search-button');
+            const toggleArrow = event.target.closest('.toggle-arrow');
             const button = event.target.closest('.accordion-button');
 
             if (searchButton) {
@@ -198,6 +204,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const link = button.querySelector('a');
                 if (link) {
                     handleSearchOrNavigate(link);
+                }
+            } else if (toggleArrow) {
+                event.stopPropagation();
+                if (!button.classList.contains('no-children')) {
+                    button.classList.toggle('active');
+                    const panel = button.nextElementSibling;
+                    panel.classList.toggle('is-open');
                 }
             } else if (button) {
                 if (button.classList.contains('no-children')) {
