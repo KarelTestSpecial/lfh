@@ -25,10 +25,53 @@ header, footer {
     padding: 1.5rem 1rem;
 }
 
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
 header h1 {
     margin: 0;
     font-size: 1.8rem;
     font-weight: 500;
+}
+
+/* Language Switcher */
+#lang-switcher {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.lang-btn {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.lang-btn:hover {
+    color: white;
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+.lang-btn.active {
+    color: var(--header-bg);
+    background-color: white;
+    border-color: white;
+}
+
+.lang-separator {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.8rem;
 }
 
 footer {
@@ -50,7 +93,7 @@ main {
     margin-bottom: 8px;
     border: 1px solid var(--border-color);
     border-radius: 5px;
-    overflow: hidden; /* Zorgt ervoor dat de border-radius werkt */
+    overflow: hidden;
 }
 
 .accordion-button {
@@ -100,13 +143,13 @@ main {
 }
 
 .search-button:hover {
-    background-color: #1a4a9c; /* Darker blue */
+    background-color: #1a4a9c;
 }
 
 .accordion-panel {
     display: none;
     padding: 15px 20px;
-    background-color: #fafafa; /* Lichte achtergrond voor geopende panelen */
+    background-color: #fafafa;
 }
 
 .accordion-panel.is-open {
@@ -123,6 +166,11 @@ main {
 
 /* Responsive design */
 @media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
     header h1 {
         font-size: 1.5rem;
     }
@@ -138,7 +186,17 @@ main {
 
 /* Stijl voor de zoekknop wanneer er geen subitems zijn */
 .accordion-button.no-children .search-button {
-    background-color: var(--primary-bg); /* Witte achtergrond */
-    color: var(--accent-color); /* Blauwe tekst */
-    border: 1px solid var(--accent-color); /* Blauwe rand */
+    background-color: var(--primary-bg);
+    color: var(--accent-color);
+    border: 1px solid var(--accent-color);
+}
+
+/* Topic page styles */
+nav a {
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+nav a:hover {
+    text-decoration: underline;
 }

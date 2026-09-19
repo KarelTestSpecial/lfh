@@ -4,18 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Health Science Overview</title>
-    <link rel="stylesheet" href="style.css?v=1.1">
+    <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 </head>
 <body>
     <header>
-        <h1>An Overview of Recent Insights in Health Science</h1>
+        <div class="header-content">
+            <h1 data-i18n="mainTitle">An Overview of Recent Insights in Health Science</h1>
+            <div id="lang-switcher">
+                <button id="lang-en" class="lang-btn active" title="English">EN</button>
+                <span class="lang-separator">|</span>
+                <button id="lang-nl" class="lang-btn" title="Nederlands">NL</button>
+            </div>
+        </div>
     </header>
     <main id="accordion-container">
         <!-- The accordion content is dynamically loaded here by JavaScript -->
     </main>
     <footer>
-        <p>Generated with the help of AI.</p>
+        <p data-i18n="footerText">Generated with the help of AI.</p>
     </footer>
 </body>
 </html>

@@ -3,32 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Topic Detail</title> <!-- Title will be updated by JS -->
+    <title>Topic Detail</title>
     <link rel="stylesheet" href="style.css">
     <script src="topic.js" defer></script>
 </head>
 <body>
     <header>
-        <h1>An Overview of Recent Insights in Health Science</h1>
+        <div class="header-content">
+            <h1 data-i18n="mainTitle">An Overview of Recent Insights in Health Science</h1>
+            <div id="lang-switcher">
+                <button id="lang-en" class="lang-btn active" title="English">EN</button>
+                <span class="lang-separator">|</span>
+                <button id="lang-nl" class="lang-btn" title="Nederlands">NL</button>
+            </div>
+        </div>
     </header>
 
     <main>
         <nav>
-            <a href="index.html">&larr; Back to overview</a>
+            <a href="index.html" data-i18n="backToOverview">&larr; Back to overview</a>
         </nav>
         <div id="breadcrumb-container" style="margin-top: 2rem; font-size: 0.9em; color: #555;">
-            <!-- Breadcrumb path will be inserted here by JS -->
         </div>
         <h1 id="topic-title" style="margin-top: 1rem;">
-            <!-- Topic title will be inserted here by JS -->
         </h1>
         <article id="topic-content" style="margin-top: 2rem; border-top: 1px solid #ddd; padding-top: 2rem;">
-            <!-- Main content will be inserted here by JS -->
         </article>
     </main>
 
     <footer style="position: fixed; bottom: 0; width: 100%;">
-        <p>Generated with the help of AI.</p>
+        <p data-i18n="footerText">Generated with the help of AI.</p>
     </footer>
 </body>
 </html>

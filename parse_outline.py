@@ -1,4 +1,5 @@
 import json
+import sys
 
 def parse_line(line):
     """Parses a single line to get its indentation level and title."""
@@ -14,10 +15,7 @@ def build_hierarchy(lines):
     if not lines:
         return []
 
-    # The root of our final JSON structure
     root = []
-    # A stack to keep track of the parent nodes at each level
-    # We initialize it with the root list
     parent_stack = { -1: root }
 
     for line in lines:
@@ -31,20 +29,17 @@ def build_hierarchy(lines):
             "children": []
         }
 
-        # Get the correct parent from the stack and add the new node
         parent = parent_stack[level - 1]
         parent.append(node)
 
-        # Update the stack for the current level
         parent_stack[level] = node["children"]
 
     return root
 
-def main():
-    """Main function to read the outline, parse it, and write to JSON."""
+def process_outline(input_file, output_file):
+    """Process a single outline file and write to JSON."""
     try:
-        with open('LFHoutline.txt', 'r', encoding='utf-8') as f:
-            # The first line is a UTF-8 BOM in the provided file, skip it if present
+        with open(input_file, 'r', encoding='utf-8') as f:
             content = f.read()
             if content.startswith('\ufeff'):
                 content = content[1:]
@@ -52,15 +47,35 @@ def main():
 
         hierarchy = build_hierarchy(lines)
 
-        with open('data.json', 'w', encoding='utf-8') as f:
+        with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(hierarchy, f, indent=4, ensure_ascii=False)
 
-        print("Successfully converted LFHoutline.txt to data.json")
+        print(f"Successfully converted {input_file} to {output_file}")
+        return True
 
     except FileNotFoundError:
-        print("Error: LFHoutline.txt not found.")
+        print(f"Error: {input_file} not found.")
+        return False
     except Exception as e:
         print(f"An error occurred: {e}")
+        return False
+
+def main():
+    """Main function to process all outline files."""
+    files = [
+        ('LFHoutline.txt', 'data.en.json'),
+        ('LFHoutline_nl.txt', 'data.nl.json')
+    ]
+
+    success_count = 0
+    for input_file, output_file in files:
+        if process_outline(input_file, output_file):
+            success_count += 1
+
+    if success_count == len(files):
+        print("\nAll files processed successfully!")
+    else:
+        print(f"\nProcessed {success_count}/{len(files)} files.")
 
 if __name__ == "__main__":
     main()

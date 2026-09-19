@@ -1,38 +1,137 @@
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('accordion-container');
 
-    // Initial call to fetch data and start the process
-    async function initAccordion() {
+    // --- i18n Translations ---
+    const translations = {
+        en: {
+            mainTitle: 'An Overview of Recent Insights in Health Science',
+            footerText: 'Generated with the help of AI.',
+            noData: 'No data found.',
+            loadError: 'An error occurred while loading the content.',
+            searchPlaceholder: 'Search',
+            backToOverview: '← Back to overview',
+            pathLabel: 'Path:',
+            topicNotFound: 'Error: Topic not found',
+            topicNotFoundMsg: 'No topic path was provided in the URL.',
+            topicPlaceholder: 'The content for this specific topic will be added soon.',
+            topicFuture: 'In a future version, AI-generated information about <strong>{title}</strong> will appear here.',
+            langEn: 'English',
+            langNl: 'Nederlands'
+        },
+        nl: {
+            mainTitle: 'Een overzicht van recente inzichten in de gezondheidsleer',
+            footerText: 'Gegenereerd met behulp van AI.',
+            noData: 'Geen data gevonden.',
+            loadError: 'Er is een fout opgetreden bij het laden van de content.',
+            searchPlaceholder: 'Zoek',
+            backToOverview: '← Terug naar overzicht',
+            pathLabel: 'Pad:',
+            topicNotFound: 'Fout: Onderwerp niet gevonden',
+            topicNotFoundMsg: 'Er is geen onderwerp-pad meegestuurd in de URL.',
+            topicPlaceholder: 'De content voor dit specifieke onderwerp wordt binnenkort toegevoegd.',
+            topicFuture: 'In een toekomstige versie zal hier door AI-gegenereerde informatie verschijnen over <strong>{title}</strong>.',
+            langEn: 'English',
+            langNl: 'Nederlands'
+        }
+    };
+
+    // --- Language Management ---
+    let currentLang = 'en';
+
+    function detectLanguage() {
+        // 1. Check localStorage for saved preference
+        const saved = localStorage.getItem('lfh-lang');
+        if (saved && translations[saved]) return saved;
+
+        // 2. Check browser language
+        const browserLang = navigator.language || navigator.userLanguage || 'en';
+        if (browserLang.startsWith('nl')) return 'nl';
+
+        // 3. Default fallback
+        return 'en';
+    }
+
+    function setLanguage(lang) {
+        if (!translations[lang]) return;
+        currentLang = lang;
+        localStorage.setItem('lfh-lang', lang);
+        document.documentElement.lang = lang;
+
+        // Update lang switcher buttons
+        document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+        document.getElementById('lang-nl').classList.toggle('active', lang === 'nl');
+
+        // Update all translated elements
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (translations[lang][key]) {
+                el.textContent = translations[lang][key];
+            }
+        });
+
+        // Update page title
+        document.title = translations[lang].mainTitle;
+
+        // Reload accordion data
+        loadAccordionData();
+    }
+
+    function t(key, replacements = {}) {
+        let text = translations[currentLang][key] || translations['en'][key] || key;
+        for (const [placeholder, value] of Object.entries(replacements)) {
+            text = text.replace(`{${placeholder}}`, value);
+        }
+        return text;
+    }
+
+    // --- Accordion Logic ---
+    let manifest = [];
+    let manifestFetched = false;
+
+    const fetchManifest = async () => {
+        if (manifestFetched) return manifest;
         try {
-            const response = await fetch('data.json');
+            const response = await fetch(`content-manifest.${currentLang}.json`);
+            if (!response.ok) throw new Error('Manifest fetch failed');
+            manifest = await response.json();
+            manifestFetched = true;
+            return manifest;
+        } catch (e) {
+            console.error(e);
+            return [];
+        }
+    };
+
+    async function loadAccordionData() {
+        container.innerHTML = '';
+        manifest = [];
+        manifestFetched = false;
+
+        try {
+            const response = await fetch(`data.${currentLang}.json`);
             if (!response.ok) {
-                throw new Error(`HTTP-fout! Status: ${response.status}`);
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
             const data = await response.json();
 
             if (data.length > 0) {
-                // Build the accordion first
                 buildAccordion(data, container);
-                // Then attach the now-async event listeners
                 attachEventListeners();
 
-                // --- START VAN DE WIJZIGING ---
-                // Open de eerste (hoofd)node door een klik te simuleren
+                // Open the first (root) node by simulating a click
                 const firstButton = container.querySelector('.accordion-button');
                 if (firstButton) {
                     firstButton.click();
                 }
-                // --- EINDE VAN DE WIJZIGING ---
             } else {
-                container.innerHTML = '<p>Geen data gevonden.</p>';
+                container.innerHTML = `<p>${t('noData')}</p>`;
             }
         } catch (error) {
-            container.innerHTML = '<p>Er is een fout opgetreden bij het laden van de content.</p>';
-            console.error('Fout bij het ophalen of parsen van data.json:', error);
+            container.innerHTML = `<p>${t('loadError')}</p>`;
+            console.error('Error loading data.json:', error);
         }
     }
 
-    // This function builds the HTML structure, including the links
     function buildAccordion(items, parentElement, currentPath = []) {
         if (!items || items.length === 0) {
             return;
@@ -49,9 +148,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const link = document.createElement('a');
             link.textContent = item.title;
-            // The href now contains the raw path string for easy access
-            link.href = `topic.html?path=${urlEncodedPath}`;
-            link.dataset.path = pathString; // Store raw path for logic
+            link.href = `topic.html?path=${urlEncodedPath}&lang=${currentLang}`;
+            link.dataset.path = pathString;
 
             button.appendChild(link);
 
@@ -59,6 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
             searchButton.className = 'search-button';
             searchButton.textContent = '>';
             button.appendChild(searchButton);
+
             const panel = document.createElement('div');
             panel.className = 'accordion-panel';
             accordionItem.appendChild(button);
@@ -73,29 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- START VAN DE FINALE WIJZIGING ---
-
-    // This function now contains the core routing logic
     function attachEventListeners() {
-        // The manifest is fetched once and stored for performance
-        let manifest = [];
-        let manifestFetched = false;
-        const fetchManifest = async () => {
-            if (manifestFetched) return manifest;
-            try {
-                const response = await fetch('content-manifest.json');
-                if (!response.ok) throw new Error('Manifest fetch failed');
-                manifest = await response.json();
-                manifestFetched = true;
-                return manifest;
-            } catch (e) {
-                console.error(e);
-                return []; // Return empty on error
-            }
-        };
-        // Pre-fetch the manifest when the page loads
-        fetchManifest();
-
         async function handleSearchOrNavigate(link) {
             const path = link.dataset.path;
             const manifest = await fetchManifest();
@@ -116,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const button = event.target.closest('.accordion-button');
 
             if (searchButton) {
-                event.stopPropagation(); // Voorkom dat de accordeon ook opent/sluit
+                event.stopPropagation();
                 const link = button.querySelector('a');
                 if (link) {
                     handleSearchOrNavigate(link);
@@ -128,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         handleSearchOrNavigate(link);
                     }
                 } else {
-                    event.preventDefault(); // Voorkom navigatie
+                    event.preventDefault();
                     button.classList.toggle('active');
                     const panel = button.nextElementSibling;
                     panel.classList.toggle('is-open');
@@ -137,8 +214,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- EINDE VAN DE FINALE WIJZIGING ---
+    // --- Language Switcher ---
+    document.getElementById('lang-en').addEventListener('click', () => setLanguage('en'));
+    document.getElementById('lang-nl').addEventListener('click', () => setLanguage('nl'));
 
+    // --- Dynamic Style ---
     const style = document.createElement('style');
     style.textContent = `
         .accordion-button a {
@@ -153,5 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
     document.head.appendChild(style);
 
-    initAccordion();
+    // --- Initialize ---
+    currentLang = detectLanguage();
+    setLanguage(currentLang);
 });
