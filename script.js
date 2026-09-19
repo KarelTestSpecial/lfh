@@ -117,10 +117,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.length > 0) {
                 buildAccordion(data, container);
 
-                // Open the first (root) node by simulating a click
+                // Open the first (root) node directly
                 const firstButton = container.querySelector('.accordion-button');
-                if (firstButton) {
-                    firstButton.click();
+                const firstPanel = container.querySelector('.accordion-panel');
+                if (firstButton && firstPanel) {
+                    firstButton.classList.add('active');
+                    firstPanel.classList.add('is-open');
                 }
             } else {
                 container.innerHTML = `<p>${t('noData')}</p>`;
