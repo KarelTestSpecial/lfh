@@ -116,7 +116,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (data.length > 0) {
                 buildAccordion(data, container);
-                attachEventListeners();
 
                 // Open the first (root) node by simulating a click
                 const firstButton = container.querySelector('.accordion-button');
@@ -217,6 +216,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Language Switcher ---
     document.getElementById('lang-en').addEventListener('click', () => setLanguage('en'));
     document.getElementById('lang-nl').addEventListener('click', () => setLanguage('nl'));
+
+    // --- Event Listeners (register once, not per language switch) ---
+    attachEventListeners();
 
     // --- Dynamic Style ---
     const style = document.createElement('style');
